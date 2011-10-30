@@ -84,6 +84,7 @@ class Chef
 
         if @repo.finalize_updates_from_github(@cookbook_name, "#{@github_user}/#{@github_repo}", sha)
           @repo.reset_to_default_state
+          ensure_cookbooks_path_exists
           @repo.merge_updates_from(@cookbook_name, sha)
         else
           @repo.reset_to_default_state
@@ -130,6 +131,10 @@ class Chef
       def clear_existing_files(cookbook_path)
         ui.info("Removing pre-existing version.")
         shell_out!("rm -r #{cookbook_path}", :cwd => @install_path) if File.directory?(cookbook_path)
+      end
+
+      def ensure_cookbooks_path_exists
+        shell_out!("mkdir -p #{@install_path}", :cwd => tmpdir) unless File.exists?(@install_path)
       end
 
       def github_uri
