@@ -141,7 +141,10 @@ class Chef
       end
 
       def sha
-        @sha ||= noauth_rest.get_rest("http://github.com/api/v2/json/repos/show/#{@github_user}/#{@github_repo}/branches")['branches'][github_branch]
+        @sha ||= begin
+                   data = noauth_rest.get_rest("https://api.github.com/repos/#{@github_user}/#{@github_repo}/git/refs/heads/#{github_branch}")
+                   data['object']['sha']
+                 end
       end
 
       def github_branch
