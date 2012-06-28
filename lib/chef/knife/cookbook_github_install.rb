@@ -142,13 +142,25 @@ class Chef
 
       def sha
         @sha ||= begin
-                   data = noauth_rest.get_rest("https://api.github.com/repos/#{@github_user}/#{@github_repo}/git/refs/heads/#{github_branch}")
+                   data = sha_for_branch_or_tag
                    data['object']['sha']
                  end
       end
 
       def github_branch
         @github_branch ||= 'master'
+      end
+
+      # tries for the branch and then the tag
+      def sha_for_branch_or_tag
+        begin
+          # try for the branch first
+          data = noauth_rest.get_rest("https://api.github.com/repos/#{@github_user}/#{@github_repo}/git/refs/heads/#{github_branch}")
+        rescue Net::HTTPServerException, Net::HTTPFatalError => e
+          # try for the tag if the branch was not found
+          data = noauth_rest.get_rest("https://api.github.com/repos/#{@github_user}/#{@github_repo}/git/refs/tags/#{github_branch}")
+        end
+        data
       end
 
     end
