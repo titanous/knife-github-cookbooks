@@ -74,6 +74,8 @@ class Chef
 
         @repo = CookbookSCMRepoExtensions.new(@install_path, ui, config)
 
+        ensure_cookbooks_path_exists
+        
         @repo.sanity_check
         @repo.reset_to_default_state
         @repo.prepare_to_import(@cookbook_name)
